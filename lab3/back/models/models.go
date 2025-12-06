@@ -10,7 +10,14 @@ type Product struct {
 
 type User struct {
 	Id               int
-	Name             string
+	Username         string
 	PasswordHash     string
 	RegistrationDate string
 }
+
+type UserRegistration struct {
+	Username string
+	Password string
+}
+
+type Session struct{}

@@ -1,11 +1,12 @@
 package main
 
 import (
+	"backApp/handlers"
 	"backApp/models"
+	"backApp/services"
 	"encoding/json"
 	"net/http"
 	"os"
-
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -21,12 +22,12 @@ func getProducts(c echo.Context) error {
 
 	var start, end int
 	start = (page - 1) * limit
-	if start > len(Products) {
+	if start > len(CachedProducts) {
 		return c.String(http.StatusNotFound, "Page out of range")
 	}
 
-	end = min(page*limit, len(Products))
-	return c.JSON(http.StatusOK, Products[start:end])
+	end = min(page*limit, len(CachedProducts))
+	return c.JSON(http.StatusOK, CachedProducts[start:end])
 
 }
 
@@ -45,16 +46,21 @@ func loadProducts() []models.Product {
 	return products
 }
 
-var Products []models.Product
+var CachedProducts []models.Product
 
 func main() {
 	e := echo.New()
 
-	Products = loadProducts()
+	CachedProducts = loadProducts()
+
+	authService := services.NewAuthService()
 
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 	e.GET("/products", getProducts)
+
+	handlers.Auth(e, authService)
+
 	e.Logger.Fatal(e.Start(":1323"))
 }
