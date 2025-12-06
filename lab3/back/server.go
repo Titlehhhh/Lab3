@@ -3,6 +3,7 @@ package main
 import (
 	"backApp/handlers"
 	"backApp/models"
+	"backApp/repository"
 	"backApp/services"
 	"encoding/json"
 	"net/http"
@@ -53,7 +54,8 @@ func main() {
 
 	CachedProducts = loadProducts()
 
-	authService := services.NewAuthService()
+	userRepo := repository.NewUserRepository()
+	authService := services.NewAuthService(&userRepo)
 
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
