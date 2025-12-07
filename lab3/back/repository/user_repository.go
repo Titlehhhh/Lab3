@@ -2,22 +2,30 @@ package repository
 
 import (
 	"backApp/models"
+	"encoding/json"
 	"errors"
+	"os"
 	"sync"
 )
 
 type userRepository struct {
-	users sync.Map //TODO file
+	users []models.User
+	mu    sync.Mutex
 }
 
 const fileName = "users.json"
 
 func (u *userRepository) AddUser(user models.User) error {
-	if _, exists := u.users.Load(user.Username); exists {
-		return errors.New("user already exists")
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
+	u.users = append(u.users, user)
+	data, err := json.MarshalIndent(user, "", "\t")
+	if err != nil {
+		return err
 	}
-	u.users.Store(user.Username, user)
-	return nil
+
+	return os.WriteFile(fileName, data, 0644)
 }
 
 func (u *userRepository) RemoveUser(id int) error {
@@ -26,9 +34,12 @@ func (u *userRepository) RemoveUser(id int) error {
 }
 
 func (u *userRepository) GetByUsername(username string) (*models.User, error) {
-	if u, ok := u.users.Load(username); ok {
-		user := u.(models.User)
-		return &user, nil
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	for _, user := range u.users {
+		if user.Username == username {
+			return &user, nil
+		}
 	}
 	return nil, errors.New("user not found")
 }

@@ -9,10 +9,10 @@ type Product struct {
 }
 
 type User struct {
-	Id               int
-	Username         string
-	PasswordHash     string
-	RegistrationDate string
+	Id               int    `json:"id"`
+	Username         string `json:"username"`
+	PasswordHash     string `json:"password_hash"`
+	RegistrationDate string `json:"registration_date"`
 }
 
 type UserRegistration struct {
