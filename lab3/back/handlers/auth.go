@@ -13,6 +13,13 @@ func Auth(e *echo.Echo, authService services.AuthService) {
 		username := c.FormValue("username")
 		password := c.FormValue("password")
 
+		if username == "" {
+			return echo.NewHTTPError(http.StatusBadRequest, "username is required")
+		}
+		if password == "" {
+			return echo.NewHTTPError(http.StatusBadRequest, "password is required")
+		}
+
 		err := authService.Register(username, password)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -24,6 +31,13 @@ func Auth(e *echo.Echo, authService services.AuthService) {
 	e.POST("/login", func(c echo.Context) error {
 		username := c.FormValue("username")
 		password := c.FormValue("password")
+
+		if username == "" {
+			return echo.NewHTTPError(http.StatusBadRequest, "username is required")
+		}
+		if password == "" {
+			return echo.NewHTTPError(http.StatusBadRequest, "password is required")
+		}
 
 		userID, err := authService.Login(username, password)
 		if err != nil {

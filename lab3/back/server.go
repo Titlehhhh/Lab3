@@ -10,6 +10,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
@@ -49,8 +51,26 @@ func loadProducts() []models.Product {
 
 var CachedProducts []models.Product
 
+func RequireAuth(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		sess, _ := session.Get("session", c)
+		userID := sess.Values["user_id"]
+
+		if userID == nil {
+			return c.JSON(401, map[string]string{"error": "unauthorized"})
+		}
+
+		// можешь сохранить userID в контекст
+		c.Set("userID", userID)
+
+		return next(c)
+	}
+}
+
 func main() {
 	e := echo.New()
+
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
 
 	CachedProducts = loadProducts()
 
@@ -60,7 +80,7 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	e.GET("/products", getProducts)
+	e.GET("/products", getProducts, RequireAuth)
 
 	handlers.Auth(e, authService)
 

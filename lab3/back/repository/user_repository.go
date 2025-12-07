@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -16,6 +17,17 @@ type userRepository struct {
 const fileName = "users.json"
 
 func (u *userRepository) AddUser(user models.User) error {
+
+	//Validate
+
+	if strings.TrimSpace(user.Username) == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	if strings.TrimSpace(user.PasswordHash) == "" {
+		return errors.New("password cannot be empty")
+	}
+
 	u.mu.Lock()
 	defer u.mu.Unlock()
 
@@ -35,6 +47,7 @@ func (u *userRepository) RemoveUser(id int) error {
 }
 
 func (u *userRepository) GetByUsernameUnsafe(username string) (*models.User, error) {
+
 	for _, user := range u.users {
 		if user.Username == username {
 			return &user, nil
@@ -44,6 +57,11 @@ func (u *userRepository) GetByUsernameUnsafe(username string) (*models.User, err
 }
 
 func (u *userRepository) GetByUsername(username string) (*models.User, error) {
+
+	if username == "" {
+		return nil, errors.New("username cannot be empty")
+	}
+
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	return u.GetByUsernameUnsafe(username)
