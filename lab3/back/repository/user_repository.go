@@ -20,7 +20,7 @@ func (u *userRepository) AddUser(user models.User) error {
 	defer u.mu.Unlock()
 
 	u.users = append(u.users, user)
-	data, err := json.MarshalIndent(user, "", "\t")
+	data, err := json.MarshalIndent(u.users, "", "\t")
 	if err != nil {
 		return err
 	}
