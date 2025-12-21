@@ -21,6 +21,11 @@ func getProducts(c echo.Context) error {
 	if err != nil {
 		page = 1
 	}
+
+	if page < 0 {
+		page = 1
+	}
+
 	const limit = 3
 
 	var start, end int
@@ -60,7 +65,6 @@ func RequireAuth(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(401, map[string]string{"error": "unauthorized"})
 		}
 
-		// можешь сохранить userID в контекст
 		c.Set("userID", userID)
 
 		return next(c)

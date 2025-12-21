@@ -20,9 +20,8 @@ func Auth(e *echo.Echo, authService services.AuthService) {
 			return echo.NewHTTPError(http.StatusBadRequest, "password is required")
 		}
 
-		err := authService.Register(username, password)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		if err := authService.Register(username, password); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 
 		return c.JSON(http.StatusOK, map[string]string{"status": "registered"})
@@ -41,7 +40,7 @@ func Auth(e *echo.Echo, authService services.AuthService) {
 
 		userID, err := authService.Login(username, password)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": err.Error()})
+			return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 		}
 
 		sess, _ := session.Get("session", c)
