@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "password_hash": "admin123",
+    "registration_date": "2025-01-01",
+    "role": "admin"
+  },
+  {
+    "id": 2,
+    "username": "demo-user",
+    "password_hash": "demo-password",
+    "registration_date": "2025-01-02",
+    "role": "user"
+  }
+]
