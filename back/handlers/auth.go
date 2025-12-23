@@ -1,0 +1,60 @@
+package handlers
+
+import (
+	"backApp/services"
+	"net/http"
+
+	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
+)
+
+func Auth(e *echo.Echo, authService services.AuthService) {
+	e.POST("/register", func(c echo.Context) error {
+		username := c.FormValue("username")
+		password := c.FormValue("password")
+
+		if username == "" {
+			return echo.NewHTTPError(http.StatusBadRequest, "username is required")
+		}
+		if password == "" {
+			return echo.NewHTTPError(http.StatusBadRequest, "password is required")
+		}
+
+		if err := authService.Register(username, password); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+
+		return c.JSON(http.StatusOK, map[string]string{"status": "registered"})
+	})
+
+	e.POST("/login", func(c echo.Context) error {
+		username := c.FormValue("username")
+		password := c.FormValue("password")
+
+		if username == "" {
+			return echo.NewHTTPError(http.StatusBadRequest, "username is required")
+		}
+		if password == "" {
+			return echo.NewHTTPError(http.StatusBadRequest, "password is required")
+		}
+
+		userID, err := authService.Login(username, password)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+		}
+
+		sess, _ := session.Get("session", c)
+		sess.Values["user_id"] = userID
+		sess.Save(c.Request(), c.Response())
+
+		return c.JSON(http.StatusOK, map[string]string{"status": "logged in"})
+	})
+
+	e.POST("/logout", func(c echo.Context) error {
+		sess, _ := session.Get("session", c)
+		delete(sess.Values, "user_id")
+		sess.Save(c.Request(), c.Response())
+
+		return c.JSON(http.StatusOK, map[string]string{"status": "logged out"})
+	})
+}

@@ -1,0 +1,30 @@
+[
+	{
+		"id": 1,
+		"username": "admin",
+		"password_hash": "admin123",
+		"registration_date": "2025-01-01",
+		"role": "admin"
+	},
+	{
+		"id": 2,
+		"username": "demo-user",
+		"password_hash": "demo-password",
+		"registration_date": "2025-01-02",
+		"role": "user"
+	},
+	{
+		"id": 3,
+		"username": "test1",
+		"password_hash": "test123",
+		"registration_date": "2025-12-23 21:52:25.7113492 +0500 +05 m=+344.673270601",
+		"role": "user"
+	},
+	{
+		"id": 4,
+		"username": "test2",
+		"password_hash": "mN9t?}5KPwUe3*Z",
+		"registration_date": "2025-12-23 21:57:53.4158995 +0500 +05 m=+672.377820901",
+		"role": "user"
+	}
+]
