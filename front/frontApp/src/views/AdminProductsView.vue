@@ -13,20 +13,20 @@
           <div class="mb-3">
             <label class="form-label" for="admin-username">Логин</label>
             <input
-              id="admin-username"
-              v-model="loginForm.username"
-              class="form-control"
-              autocomplete="username"
+                id="admin-username"
+                v-model="loginForm.username"
+                class="form-control"
+                autocomplete="username"
             />
           </div>
           <div class="mb-3">
             <label class="form-label" for="admin-password">Пароль</label>
             <input
-              id="admin-password"
-              v-model="loginForm.password"
-              type="password"
-              class="form-control"
-              autocomplete="current-password"
+                id="admin-password"
+                v-model="loginForm.password"
+                type="password"
+                class="form-control"
+                autocomplete="current-password"
             />
           </div>
           <button class="btn btn-primary w-100" :disabled="loading">Войти</button>
@@ -53,14 +53,17 @@
               <input v-model.number="newProduct.price" class="form-control" type="number" placeholder="Цена" />
             </div>
             <div class="col-12">
-              <input v-model="newProduct.image" class="form-control" placeholder="/images/filename.jpg" />
+              <input type="file" class="form-control" accept="image/*" @change="onNewImageChange" />
+            </div>
+            <div class="col-12" v-if="newProduct.image">
+              <img :src="newProduct.image" class="img-thumbnail" style="max-height: 150px;" />
             </div>
             <div class="col-12">
               <textarea
-                v-model="newProduct.description"
-                class="form-control"
-                rows="3"
-                placeholder="Описание"
+                  v-model="newProduct.description"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Описание"
               ></textarea>
             </div>
             <div class="col-12">
@@ -89,11 +92,14 @@
               <input v-model.number="product.price" class="form-control form-control-sm" type="number" />
             </div>
             <div class="col-md-3">
-              <input v-model="product.image" class="form-control form-control-sm" />
+              <input type="file" class="form-control form-control-sm" accept="image/*" @change="e => onEditImageChange(e, product)" />
             </div>
             <div class="col-md-4">
               <textarea v-model="product.description" class="form-control form-control-sm" rows="2"></textarea>
             </div>
+          </div>
+          <div class="mt-2" v-if="product.image">
+            <img :src="product.image" class="img-thumbnail" style="max-height: 120px;" />
           </div>
           <div class="mt-2 d-flex gap-2">
             <button class="btn btn-sm btn-primary" @click="handleUpdateProduct(product)">Сохранить</button>
@@ -125,8 +131,8 @@ const error = ref('')
 const message = ref('')
 
 const loginForm = reactive({
-  username: 'admin',
-  password: 'admin123',
+  username: '',
+  password: '',
 })
 
 const newProduct = reactive<ProductPayload>({
@@ -135,6 +141,28 @@ const newProduct = reactive<ProductPayload>({
   description: '',
   image: '',
 })
+
+const fileToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+
+const onNewImageChange = async (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (file) {
+    newProduct.image = await fileToBase64(file)
+  }
+}
+
+const onEditImageChange = async (e: Event, product: Product) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (file) {
+    product.image = await fileToBase64(file)
+  }
+}
 
 const resetNewProduct = () => {
   newProduct.name = ''

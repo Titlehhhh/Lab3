@@ -32,7 +32,7 @@ func (a *authService) Register(username, password string) error {
 
 	user, _ := a.repo.GetByUsername(username)
 	if user != nil {
-		return errors.New("User already exists")
+		return errors.New("user already exists")
 	}
 
 	newUser := models.User{
@@ -52,12 +52,12 @@ func (a *authService) Login(username, password string) (int, error) {
 
 	user, err := a.repo.GetByUsername(username)
 	if err != nil {
-		return 0, errors.New("User not found")
+		return 0, errors.New("user not found")
 	}
 
 	// TODO Hash
 	if password != user.PasswordHash {
-		return 0, errors.New("Password does not match")
+		return 0, errors.New("password does not match")
 	}
 
 	return user.Id, nil
